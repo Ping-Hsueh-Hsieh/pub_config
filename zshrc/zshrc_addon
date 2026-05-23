@@ -1,0 +1,100 @@
+eval "$(/opt/homebrew/bin/brew shellenv)"
+eval "$(zoxide init zsh)"
+
+export GPG_TTY=tty
+export TERM=xterm-256color
+
+export EDITOR=nvim
+bindkey -e
+
+####################################################################################################
+# local include path
+####################################################################################################
+
+LOCAL_SOFTWARE_PATH="$HOME/Documents/software"
+
+# YAZI_PATH="$LOCAL_SOFTWARE_PATH/yazi/yazi-aarch64-apple-darwin"
+# export PATH="$YAZI_PATH:$PATH"
+
+## NOTE: this will change `gnused` to `sed`, which will override the native `sed` util from MacOS
+# export PATH="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
+
+export ACADOS_SOURCE_DIR="/Users/hph/Documents/repo/robotics/acados"
+
+####################################################################################################
+
+# To use the bundled libunwind please use the following LDFLAGS:
+#     LDFLAGS="-L/opt/homebrew/opt/llvm/lib/unwind -lunwind"
+
+# zlib
+export LDFLAGS="-L$HOMEBREW_PREFIX/opt/zlib/lib $LDFLAGS"
+export CPPFLAGS="-I$HOMEBREW_PREFIX/opt/zlib/include $CPPFLAGS"
+export PKG_CONFIG_PATH="$HOMEBREW_PREFIX/opt/zlib/lib/pkgconfig:$PKG_CONFIG_PATH"
+
+# To use the bundled libc++ please use the following LDFLAGS:
+export LDFLAGS="-L$HOMEBREW_PREFIX/opt/llvm/lib $LDFLAGS"
+export LDFLAGS="-L$HOMEBREW_PREFIX/lib -L$HOMEBREW_PREFIX/opt/llvm/lib/c++ -L$HOMEBREW_PREFIX/opt/llvm/lib/unwind -lunwind $LDFLAGS"
+export LDFLAGS="-L$HOME/.local/lib $LDFLAGS"
+
+export CFLAGS="-I$HOMEBREW_PREFIX/opt/llvm/include"
+export CPPFLAGS="-I$HOMEBREW_PREFIX/opt/llvm/include"
+
+export CFLAGS="-I$HOME/.local/include $CFLAGS"
+export CPPFLAGS="-I$HOME/.local/include $CPPFLAGS"
+
+export PATH="$HOMEBREW_PREFIX/opt/llvm/bin:$PATH"
+
+export CMAKE_PREFIX_PATH="$HOMEBREW_PREFIX:$HOMEBREW_PREFIX/opt/llvm:$CMAKE_PREFIX_PATH"
+
+####################################################################################################
+# === USER-LOCAL INSTALLS (no sudo) ===
+export LOCAL_PREFIX="$HOME/.local"
+
+export PATH="$LOCAL_PREFIX/bin:$PATH"
+export PATH="$LOCAL_PREFIX/include:$PATH"
+export PATH="$LOCAL_PREFIX/lib:$PATH"
+
+# 1. CMake finds packages (mujoco, etc.)
+export CMAKE_PREFIX_PATH="$LOCAL_PREFIX:$CMAKE_PREFIX_PATH"
+
+# 2. Compiler finds headers
+export CPATH="$LOCAL_PREFIX/include:$CPATH"
+export CPATH="$HOMEBREW_PREFIX/include:$CPATH"
+export CPATH="$HOMEBREW_PREFIX/opt/llvm/include:$CPATH"
+
+# 3. Linker finds libraries
+export LIBRARY_PATH="$LOCAL_PREFIX/lib:$LIBRARY_PATH"
+export LD_LIBRARY_PATH="$LOCAL_PREFIX/lib:$LD_LIBRARY_PATH"
+export LIBRARY_PATH="$HOMEBREW_PREFIX/lib:$LIBRARY_PATH"
+export LD_LIBRARY_PATH="$HOMEBREW_PREFIX/lib:$LD_LIBRARY_PATH"
+
+# 4. pkg-config finds .pc files
+export PKG_CONFIG_PATH="$LOCAL_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
+
+export DYLD_LIBRARY_PATH="$LOCAL_PREFIX/lib:$DYLD_LIBRARY_PATH"
+####################################################################################################
+
+
+# Alias section
+alias ls='eza --group-directories-first'
+# alias ls='gls -L --color=always --group-directories-first'
+alias l='ls'
+alias ll='ls -lha --icons --hyperlink'
+alias lt='eza --tree --level=2 --long --icons --git'
+alias lta='lt -a'
+alias v='nvim'
+
+if [[ -n "$TMUX" ]] then
+elif [[ -n "$NVIM" ]] then
+else
+    conda activate py314
+fi
+
+if [[ -f $HOME/.cargo/env ]] then
+    source $HOME/.cargo/env
+fi
+
+export WINEPREFIX="$HOME/.local/share/wineprefixes/win64"
+export WINEARCH="win64"
+
+source <(fzf --zsh)
