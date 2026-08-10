@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+STATE="$XDG_RUNTIME_DIR/i3-workspace-outputs.json"
+
+active_count=$(
+    xrandr --query |
+    awk '/ connected/ && $0 ~ /[0-9]+x[0-9]+\+/ {count++} END {print count+0}'
+)
+
+# Only save while docked/multi-monitor.
+# This prevents the mobile configuration from overwriting
+# our remembered HDMI workspace assignments.
+if [ "$active_count" -gt 1 ]; then
+    i3-msg -t get_workspaces |
+        jq '[.[] | {name: .name, output: .output}]' \
+        > "$STATE"
+fi
